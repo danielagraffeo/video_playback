@@ -173,12 +173,11 @@ function selectResponse(questionId, value, button) {
   const likert = button.parentElement;
   [...likert.children].forEach(option => option.classList.remove('selected'));
   button.classList.add('selected');
-  btnContinue.disabled = Object.keys(selectedResponses).length !== questions.length;
 }
 
 function showQuestion() {
   selectedResponses = {};
-  btnContinue.disabled = true;
+  btnContinue.disabled = false;
   questionGroups.querySelectorAll('.likert button').forEach(button => {
     button.classList.remove('selected');
   });
@@ -212,7 +211,7 @@ btnContinue.addEventListener('click', async () => {
 function makeCsv() {
   const header = 'participant,segment,video_start,video_end,happy,sad,angry,scared,surprised,disgusted,certainty,reaction_time_ms\n';
   const rows = results.map(r =>
-    [r.participant, r.segment, r.start, r.end, ...questions.map(question => r[question.id]), r.rt_ms].join(',')
+    [r.participant, r.segment, r.start, r.end, ...questions.map(question => r[question.id] ?? ''), r.rt_ms].join(',')
   ).join('\n');
   return header + rows;
 }
@@ -242,12 +241,12 @@ async function saveToDataPipe(csv) {
   }
 
   if (!response.ok) {
-    const detail = result?.error || responseText || 'No additional details were provided.';
+    const detail = result?.message || result?.error || responseText || 'No additional details were provided.';
     throw new Error(`DataPipe returned HTTP ${response.status}: ${detail}`);
   }
 
   if (result?.error) {
-    throw new Error(result.error);
+    throw new Error(result.message || result.error);
   }
 }
 
@@ -259,8 +258,8 @@ async function finish() {
       <td>${r.segment}</td>
       <td>${r.start}</td>
       <td>${r.end}</td>
-      <td>${questions.slice(0, -1).map(question => `${question.id}: ${r[question.id]}`).join(', ')}</td>
-      <td>${r.certainty}</td>
+      <td>${questions.slice(0, -1).map(question => `${question.id}: ${r[question.id] ?? ''}`).join(', ')}</td>
+      <td>${r.certainty ?? ''}</td>
       <td>${r.rt_ms}</td>
     `;
     resultsBody.appendChild(tr);
