@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empathic Accuracy Replay — Prototype v1</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="wrap">
+
+    <!-- SCREEN 1: setup -->
+    <section id="screen-setup" class="screen">
+      <h1>Local Video Replay — Prototype v1</h1>
+      <p class="lede">Select a video, enter a participant ID, and press start. The video will play in fixed segments and pause automatically after each one.</p>
+
+      <div class="field">
+        <label for="video-file">Video file</label>
+        <input type="file" id="video-file" accept="video/*">
+      </div>
+
+      <div class="field">
+        <label for="participant-id">Participant ID</label>
+        <input type="text" id="participant-id" placeholder="e.g. 001">
+      </div>
+
+      <div class="field">
+        <label for="interval-seconds">Segment length (seconds)</label>
+        <input type="number" id="interval-seconds" value="10" min="1">
+      </div>
+
+      <button id="btn-start" disabled>Start</button>
+      <p id="setup-error" class="error" hidden></p>
+    </section>
+
+    <!-- SCREEN 2: intro -->
+    <section id="screen-intro" class="screen" hidden>
+      <h1>Welcome to the playback task!</h1>
+      <p class="lede">Please watch the video and answer the questions as they appear.</p>
+      <button id="btn-begin">Begin</button>
+    </section>
+
+    <!-- SCREEN 3: playback -->
+    <section id="screen-playback" class="screen screen-playback" hidden>
+      <div class="video-wrap">
+        <video id="player" playsinline></video>
+      </div>
+      <p class="status" id="playback-status">Segment 1</p>
+    </section>
+
+    <!-- SCREEN 4: question -->
+    <section id="screen-question" class="screen" hidden>
+      <div id="question-groups">
+        <!-- questions injected by JS -->
+      </div>
+      <button id="btn-continue" disabled>Continue</button>
+    </section>
+
+    <!-- SCREEN 5: complete -->
+    <section id="screen-complete" class="screen" hidden>
+      <h1>Done</h1>
+      <p class="lede">All segments have been shown. Here's what was recorded:</p>
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th>Segment</th>
+            <th>Start (s)</th>
+            <th>End (s)</th>
+            <th>Emotion ratings</th>
+            <th>Accuracy certainty</th>
+            <th>RT (ms)</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+      <p id="datapipe-status" class="status" role="status"></p>
+      <button id="btn-download">Download CSV</button>
+    </section>
+
+  </main>
+
+  <script src="experiment.js"></script>
+</body>
+</html>
