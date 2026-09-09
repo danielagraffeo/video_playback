@@ -218,7 +218,8 @@ function makeCsv() {
 }
 
 async function saveToDataPipe(csv) {
-  const filename = `${participantId.replace(/[^a-zA-Z0-9._-]/g, '_')}.csv`;
+  const safeParticipantId = participantId.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const filename = `${safeParticipantId}_${Date.now()}.csv`;
   const response = await fetch('https://pipe.jspsych.org/api/data/', {
     method: 'POST',
     headers: {
@@ -232,12 +233,20 @@ async function saveToDataPipe(csv) {
     }),
   });
 
-  if (!response.ok) {
-    throw new Error(`DataPipe returned HTTP ${response.status}.`);
+  const responseText = await response.text();
+  let result;
+  try {
+    result = JSON.parse(responseText);
+  } catch {
+    result = null;
   }
 
-  const result = await response.json();
-  if (result.error) {
+  if (!response.ok) {
+    const detail = result?.error || responseText || 'No additional details were provided.';
+    throw new Error(`DataPipe returned HTTP ${response.status}: ${detail}`);
+  }
+
+  if (result?.error) {
     throw new Error(result.error);
   }
 }
